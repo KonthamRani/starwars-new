@@ -1,0 +1,48 @@
+<div class="filters-container">
+<h1>Filters</h1>
+<mat-accordion>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>Movie Name</mat-panel-title>
+      </mat-expansion-panel-header>
+      <mat-checkbox [(ngModel)]="filters.movieName['all']">All</mat-checkbox>
+     <br> <mat-checkbox *ngFor="let film of films" [(ngModel)]="filters.movieName[film.title]">
+        {{ film.title }}
+      </mat-checkbox>
+    </mat-expansion-panel>
+  
+    
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Species</mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-checkbox [(ngModel)]="filters.species['all']">All</mat-checkbox>
+        <br><mat-checkbox *ngFor="let specie of species" [(ngModel)]="filters.species[specie.name]">
+          {{ specie.name }}
+        </mat-checkbox>
+      </mat-expansion-panel>
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Vehicles</mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-checkbox [(ngModel)]="filters.vehicles['all']">All</mat-checkbox>
+        <br><mat-checkbox *ngFor="let vehicle of vehicles" [(ngModel)]="filters.vehicles[vehicle.name]">
+          {{ vehicle.name }}
+        </mat-checkbox>
+      </mat-expansion-panel>
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Star Ships</mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-checkbox [(ngModel)]="filters.starships['all']">All</mat-checkbox>
+        <br><mat-checkbox *ngFor="let starship of starships" [(ngModel)]="filters.starships[starship.name]">
+          {{ starship.name }}
+        </mat-checkbox>
+      </mat-expansion-panel>
+      
+  
+    <!-- Repeat similar blocks for Vehicles, Star Ships, Birth Year -->
+  
+    <button mat-raised-button color="primary" (click)="search()">Search</button>
+  </mat-accordion>
+</div>

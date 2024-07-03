@@ -1,0 +1,39 @@
+<div *ngIf="character">
+    <h2>{{ character.name }}</h2>
+    <p>Height: {{ character.height }}</p>
+    <p>Mass: {{ character.mass }}</p>
+    <p>Hair Color: {{ character.hair_color }}</p>
+    <p>Skin Color: {{ character.skin_color }}</p>
+    <p>Eye Color: {{ character.eye_color }}</p>
+    <p>Birth Year: {{ character.birth_year || '---' }}</p>
+    <p>Gender: {{ character.gender }}</p>
+  
+    <h3>Species</h3>
+    <ul>
+      <li *ngFor="let specie of species">
+        {{ specie.name }}
+      </li>
+    </ul>
+  
+    <h3>Films</h3>
+    <ul>
+      <li *ngFor="let film of films">
+        {{ film.title }}
+      </li>
+    </ul>
+  
+    <h3>Vehicles</h3>
+    <ul>
+      <li *ngFor="let vehicle of vehicles">
+        {{ vehicle.name }}
+      </li>
+    </ul>
+  
+    <h3>Starships</h3>
+    <ul>
+      <li *ngFor="let starship of starships">
+        {{ starship.name }}
+      </li>
+    </ul>
+  </div>
+  

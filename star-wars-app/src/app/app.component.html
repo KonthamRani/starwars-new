@@ -1,0 +1,13 @@
+<nav>
+  <div>
+    <span class="star-wars">STAR WARS</span>
+    <span class="swapi-project">THE SWAPI PROJECT</span>
+  </div>
+</nav>
+
+<div class="container" *ngIf="">
+  <app-filter-panel (filterChange)="onFilterChange($event)"></app-filter-panel>
+  <app-character-table [filterValues]="filters"></app-character-table>
+</div>
+
+<router-outlet></router-outlet>
