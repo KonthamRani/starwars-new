@@ -15,7 +15,7 @@ import { CharacterTableComponent } from './character-table/character-table.compo
 import { DataService } from './data.service';
 import { AppRoutingModule } from './app-routing.module';
 import { CharacterDetailComponent } from './character-detail/character-detail.component';
-
+import {MatCardModule} from '@angular/material/card';
 @NgModule({
   declarations: [AppComponent, FilterPanelComponent, CharacterTableComponent, CharacterDetailComponent],
   imports: [
@@ -28,7 +28,8 @@ import { CharacterDetailComponent } from './character-detail/character-detail.co
     MatExpansionModule,
     MatButtonModule,
     FormsModule,
-    AppRoutingModule
+    AppRoutingModule,
+    MatCardModule
   ],
   providers: [DataService],
   bootstrap: [AppComponent],

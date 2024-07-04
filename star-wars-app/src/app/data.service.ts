@@ -62,4 +62,7 @@ getVehicle(url: string): Observable<any> {
 getStarship(url: string): Observable<any> {
   return this.http.get<any>(url);
 }
+getPlanet(url: string): Observable<any> {
+  return this.http.get<any>(url);
+}
 }

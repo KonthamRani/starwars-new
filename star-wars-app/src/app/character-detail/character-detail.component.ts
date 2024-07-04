@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 export class CharacterDetailComponent implements OnInit, OnDestroy {
   character: any = {};
   species: any = [];
+  planets:any=[];
   films: any = [];
   vehicles: any = [];
   starships: any = [];
@@ -40,23 +41,23 @@ selectedUserId:string=this._activatedRoute.snapshot.params['id'];
       this.fetchFilms();
       this.fetchVehicles();
       this.fetchStarships();
+      this.fetchPlanet();
     });
   }
 
-  // fetchSpecies(): void {
-  //   if (this.character.species) {
-  //     console.log("this.character.species",this.character.species.join())
-  //     this.dataService.getSpecie(this.character.species.join()).subscribe((data: any) => {
-  //       this.species = data;
-  //     });
-  //   }
-  // }
+
   fetchSpecies(): void {
     const speciesUrls = this.character.species;
     speciesUrls.forEach((specieUrl: string) => {
       this.dataService.getSpecie(specieUrl).subscribe((data: any) => {
         this.species.push(data);
       });
+    });
+  }
+  fetchPlanet(): void {
+    const planetUrls = this.character.homeworld;
+    this.dataService.getPlanet(planetUrls).subscribe((data: any) => {
+      this.planets.push(data);
     });
   }
   fetchFilms(): void {

@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { FilterPanelComponent } from './filter-panel/filter-panel.component';
 import { CharacterTableComponent } from './character-table/character-table.component';
 import { CharacterDetailComponent } from './character-detail/character-detail.component';
 

@@ -71,7 +71,7 @@
                 <ng-container matColumnDef="name">
                   <mat-header-cell *matHeaderCellDef> Character Name </mat-header-cell>
                   <mat-cell *matCellDef="let element; let i=index;">
-                    <div (click)="goToDetails(i+1)"> 
+                    <div (click)="goToDetails(i+1)" style="cursor:pointer"> 
         
                         {{element.name}}
                     </div>
