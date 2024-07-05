@@ -1,38 +1,48 @@
-<!-- character-table.component.html -->
-<div class="container mt-4">
+<div class="loading-overlay" *ngIf="isLoading">
+  <div class="spinner-border text-success" role="status">
+    <span class="sr-only"></span>
+  </div>
+</div>
+
+<div class="container-div">
+  <div class="filters-container">
+    <h1>FILTERS</h1>
   <mat-accordion>
-    <mat-expansion-panel *ngFor="let filter of filters">
+    <mat-expansion-panel *ngFor="let filter of filters" >
       <mat-expansion-panel-header>
         <mat-panel-title>{{ filter.label }}</mat-panel-title>
       </mat-expansion-panel-header>
-      <mat-checkbox [(ngModel)]="filter.all" (change)="toggleAll(filter)">All</mat-checkbox>
+      <mat-checkbox class="left-aligned-checkbox" [(ngModel)]="filter.all" [checked]="isAllSelected" (change)="toggleAll(filter)">All</mat-checkbox>
       <br>
-      <mat-checkbox *ngFor="let option of filter.options" [(ngModel)]="option.selected" [disabled]="filter.all">
+      <mat-checkbox *ngFor="let option of filter.options" (change)="optionSelected(option.selected)" [(ngModel)]="option.selected" >
         {{ option.label }}
       </mat-checkbox>
     </mat-expansion-panel>
-    <button mat-raised-button color="primary" (click)="applyFilters()">Search</button>
+    <button class="search-btn" (click)="applyFilters()">SEARCH</button>
   </mat-accordion>
-
-  <table class="table mt-4">
-    <thead class="thead-dark">
+  </div>
+  <div class="table-container">
+    <h1 style="margin-bottom: 0px;">SEARCH RESULTS</h1>
+    <span>(By default this table will have all the data)</span>
+    <div class="table-with-pagination">
+  <table>
+    <thead >
       <tr>
-        <th scope="col">#</th>
-        <th scope="col">Name</th>
+        <th scope="col">Sl. No</th>
+        <th scope="col">Character Name</th>
         <th scope="col">Species</th>
         <th scope="col">Birth Year</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let character of paginatedCharacters; let i = index">
-        <th scope="row">{{ (currentPage * pageSize) + i + 1 }}</th>
-        <td>{{ character.name }}</td>
+        <td scope="row">{{ (currentPage * pageSize) + i + 1 }}</td>
+        <td (click)="goToDetails(i+1)" style="cursor: pointer;">{{ character.name }}</td>
         <td>{{ character.species }}</td>
         <td>{{ character.birth_year }}</td>
       </tr>
     </tbody>
   </table>
-
   <nav aria-label="Page navigation example">
     <ul class="pagination">
       <li class="page-item" [class.disabled]="currentPage === 0">
@@ -50,4 +60,6 @@
       </li>
     </ul>
   </nav>
+</div>
+ </div>
 </div>

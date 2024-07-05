@@ -1,8 +1,7 @@
-.container {
+.main-div {
     display: flex;
-    padding: 25px;
-    justify-content: flex-start;
-    gap: 24px;
+    margin: 40px 90px;
+    gap: 25px;
   }
   .charactersub1{
     width: 300px;
@@ -45,4 +44,13 @@
   h4{
     margin: 0px;
     font-weight: 500;
+  }
+  .character-image{
+    background-color: #8572722e;
+    border-radius: 101px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  ul{
+    margin: 0px;
   }

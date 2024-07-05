@@ -17,6 +17,7 @@ export class CharacterDetailComponent implements OnInit, OnDestroy {
   starships: any = [];
 selectedUserId:string=this._activatedRoute.snapshot.params['id'];
   private routeSubscription: Subscription | null = null;
+  isLoading: boolean=true;
 
   constructor(
     private dataService: DataService,
@@ -24,17 +25,15 @@ selectedUserId:string=this._activatedRoute.snapshot.params['id'];
   ) {}
 
   ngOnInit(): void {
-    console.log("inside character detail ",this.selectedUserId? this.selectedUserId:"nothing")
+    console.log("inside character detail ",this.selectedUserId? this.selectedUserId:"---")
     this.loadCharacterDetails(this.selectedUserId);
   }
 
   ngOnDestroy(): void {
-    if (this.routeSubscription) {
-      this.routeSubscription.unsubscribe();
-    }
   }
 
   loadCharacterDetails(characterId: string): void {
+    this.isLoading=true;
     this.dataService.getCharacterById(characterId).subscribe((data: any) => {
       this.character = data;
       this.fetchSpecies();
@@ -42,7 +41,13 @@ selectedUserId:string=this._activatedRoute.snapshot.params['id'];
       this.fetchVehicles();
       this.fetchStarships();
       this.fetchPlanet();
-    });
+      this.isLoading=false;
+    },
+    error=>{
+      this.isLoading=false;
+      console.log("getCharacterById",error)
+    }
+    );
   }
 
 

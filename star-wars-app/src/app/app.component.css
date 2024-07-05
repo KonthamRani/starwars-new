@@ -7,7 +7,7 @@ nav{
     background-color: #459d84;
 }
 nav div{
-    padding: 24px;
+    padding: 40px 45px 24px 45px;
     display: flex;
     align-items: baseline;
     justify-content: space-between;

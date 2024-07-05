@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DataService } from '../data.service';
+import { Router } from '@angular/router';
 
 interface FilterOption {
   label: string;
@@ -18,11 +19,13 @@ interface Filter {
   styleUrls: ['./character-table.component.css']
 })
 export class CharacterTableComponent implements OnInit {
+  isLoading:boolean=true;
   characters: any[] = [];
   paginatedCharacters: any[] = [];
   currentPage = 0;
   pageSize = 5;
   totalPages = 0;
+  isAllSelected:boolean=true;
   filters: Filter[] = [
     { label: 'Movie Name', options: [], all: true },
     { label: 'Species', options: [], all: true },
@@ -31,36 +34,91 @@ export class CharacterTableComponent implements OnInit {
     { label: 'Birth Year', options: [], all: true }
   ];
 
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService,private router:Router) {}
 
   ngOnInit() {
-    this.dataService.getFilms().subscribe(data => this.filters[0].options = data.results.map((film: any) => ({ label: film.title, selected: false })));
-    this.dataService.getSpecies().subscribe(data => this.filters[1].options = data.results.map((specie: any) => ({ label: specie.name, selected: false })));
-    this.dataService.getVehicles().subscribe(data => this.filters[2].options = data.results.map((vehicle: any) => ({ label: vehicle.name, selected: false })));
-    this.dataService.getStarships().subscribe(data => this.filters[3].options = data.results.map((starship: any) => ({ label: starship.name, selected: false })));
-    this.dataService.getPeople().subscribe(data => {
-      this.characters = data.results;
-
-      // Extract the birth years from the list of characters
-      const birthYears = data.results.map((character: any) => character.birth_year);
-
-      // Create a Set to filter out unique birth years
-      const uniqueBirthYears = Array.from(new Set(birthYears));
-
-      // Map the unique birth years to the desired format
-      const birthYearOptions = uniqueBirthYears.map(year => ({ label: String(year), selected: false }));
-
-      // Assign the formatted birth years to the appropriate filter
-      this.filters[4].options = birthYearOptions;
-
-      this.paginate(this.characters);  // Initialize with all characters
-    });
+    this.getFilmsData();
+    this.getSpeciesData();
+    this.getVehiclesData();
+    this.getStarShipsData();
+    this.getPeopleData();    
   }
+getFilmsData(){
+  this.isLoading=true;
+  this.dataService.getFilms().subscribe(
+    data =>{
+      this.isLoading=false;
+      this.filters[0].options = data.results.map((film: any) => ({ label: film.title, selected: true }))
+    },
+    error=>{
+      this.isLoading=false;
+      console.log("getFilmsData",error)
+    }
+    );
+}
+getSpeciesData(){
+  this.isLoading=true;
+  this.dataService.getSpecies().subscribe(data =>
+    {
+      this.isLoading=false;
+     this.filters[1].options = data.results.map((specie: any) => ({ label: specie.name, selected: true }))
+    },
+     error=>{
+      this.isLoading=false;
+      console.log("getSpeciesData",error)
+     }
+     )
 
+}
+getVehiclesData(){
+  this.isLoading=true;
+  this.dataService.getVehicles().subscribe(data =>
+    {
+      this.isLoading=false;
+
+      this.filters[2].options = data.results.map((vehicle: any) => ({ label: vehicle.name, selected: true }))
+    },
+    error=>{
+      this.isLoading=false;
+     console.log("getVehiclesData",error)
+    }
+     
+     );
+    
+}
+getStarShipsData(){
+  this.isLoading=true;
+  this.dataService.getStarships().subscribe(data => 
+    {
+
+      this.filters[3].options = data.results.map((starship: any) => ({ label: starship.name, selected: true }))
+    },
+     error=>{
+      this.isLoading=false;
+      console.log("getStarShipsData",error)
+     }
+    );
+    
+}
+getPeopleData(){
+  this.isLoading=true;
+  this.dataService.getPeople().subscribe(data => {
+    this.isLoading=false;
+    this.characters = data.results;
+    const birthYears = data.results.map((character: any) => character.birth_year);
+    const uniqueBirthYears = Array.from(new Set(birthYears));
+    const birthYearOptions = uniqueBirthYears.map(year => ({ label: String(year), selected: false }));
+    this.filters[4].options = birthYearOptions;
+    this.paginate(this.characters);
+  });
+}
   toggleAll(filter: Filter) {
     filter.options.forEach(option => option.selected = filter.all);
   }
-
+  optionSelected(option:any){
+    
+    this.isAllSelected=option;
+  }
   applyFilters() {
     let filteredCharacters = this.characters;
   
@@ -121,5 +179,9 @@ export class CharacterTableComponent implements OnInit {
 
   getPages(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i);
+  }
+  goToDetails(id:any){
+    console.log("goToDetails "+id)
+    this.router.navigate(['character/'+id]);
   }
 }
