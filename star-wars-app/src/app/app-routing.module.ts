@@ -4,8 +4,7 @@ import { CharacterTableComponent } from './character-table/character-table.compo
 import { CharacterDetailComponent } from './character-detail/character-detail.component';
 
 const routes: Routes = [
-  // {path:'',component:FilterPanelComponent},
-  {path:'character',component:CharacterTableComponent},
+  {path:'',component:CharacterTableComponent},
   {path:'character/:id',component:CharacterDetailComponent},
   { path: '**', redirectTo: '' } 
 ];

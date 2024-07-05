@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class DataService {
+  private apiUrl = 'https://swapi.dev/api';
   private apiUrls = {
     people: 'https://swapi.dev/api/people/',
     planets: 'https://swapi.dev/api/planets/',
@@ -16,7 +17,7 @@ export class DataService {
   };
 
   constructor(private http: HttpClient) {}
-
+  
   getPeople(): Observable<any> {
     return this.http.get(this.apiUrls.people);
   }

@@ -1,19 +1,21 @@
+*{
+    text-decoration: none;
+    color: white;
+}
 nav{
-    height:100px;
+    /* height:100px; */
     background-color: #459d84;
 }
 nav div{
     padding: 24px;
     display: flex;
-    align-items: center;
+    align-items: baseline;
     justify-content: space-between;
 }
 .star-wars{
     font-size: 50px;
-    color: white;
     font-weight: 700;
 }
 .swapi-project{
     font-size: 20px;
-    color:white;
 }

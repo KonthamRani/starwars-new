@@ -10,14 +10,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
-import { FilterPanelComponent } from './filter-panel/filter-panel.component';
 import { CharacterTableComponent } from './character-table/character-table.component';
 import { DataService } from './data.service';
 import { AppRoutingModule } from './app-routing.module';
 import { CharacterDetailComponent } from './character-detail/character-detail.component';
 import {MatCardModule} from '@angular/material/card';
 @NgModule({
-  declarations: [AppComponent, FilterPanelComponent, CharacterTableComponent, CharacterDetailComponent],
+  declarations: [AppComponent, CharacterTableComponent, CharacterDetailComponent],
   imports: [
     BrowserModule,
     HttpClientModule,

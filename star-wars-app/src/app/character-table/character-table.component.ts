@@ -1,117 +1,125 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { Component, OnInit } from '@angular/core';
 import { DataService } from '../data.service';
-import { Router } from '@angular/router';
-import { Film, Species, Starship, Vehicle } from './character-table';
+
+interface FilterOption {
+  label: string;
+  selected: boolean;
+}
+
+interface Filter {
+  label: string;
+  options: FilterOption[];
+  all: boolean;
+}
 
 @Component({
   selector: 'app-character-table',
   templateUrl: './character-table.component.html',
-  styleUrls: ['./character-table.component.css'],
+  styleUrls: ['./character-table.component.css']
 })
 export class CharacterTableComponent implements OnInit {
-  displayedColumns: string[] = ['sNo', 'name', 'species', 'birthYear'];
-  dataSource = new MatTableDataSource<any>();
-  totalCharacters = 0;
+  characters: any[] = [];
+  paginatedCharacters: any[] = [];
   currentPage = 0;
-  pageSize = 5;  // Set your desired page size here
-  filters: any = {
-    movieName: { all: true },
-    species: { all: true },
-    vehicles: { all: true },
-    starships: { all: true },
-    birthYear: { all: true },
-  };
-  films:Film[] = [];
-  species :Species[] = [];
-  starships:Starship[]=[];
-  vehicles:Vehicle[]=[];
-  birthYear:any[]=[];
-  // Variable to hold the fetched data
-  fetchedData: any[] = [];
+  pageSize = 5;
+  totalPages = 0;
+  filters: Filter[] = [
+    { label: 'Movie Name', options: [], all: true },
+    { label: 'Species', options: [], all: true },
+    { label: 'Vehicles', options: [], all: true },
+    { label: 'Star Ships', options: [], all: true },
+    { label: 'Birth Year', options: [], all: true }
+  ];
 
-  constructor(private dataService: DataService,private router:Router) {}
+  constructor(private dataService: DataService) {}
 
   ngOnInit() {
-    this.dataService.getFilms().subscribe((data) => (this.films = data.results));
-    this.dataService.getSpecies().subscribe((data) => (this.species = data.results));
-    this.dataService.getVehicles().subscribe((data) => (this.vehicles = data.results));
-    this.dataService.getStarships().subscribe((data) => (this.starships = data.results));
-    this.dataService.getPeople().subscribe((data) => (this.birthYear = data.results.map((person: { birth_year: any; }) => person.birth_year)));
-    this.loadCharacters();  // Load characters only once when component initializes
-  }
+    this.dataService.getFilms().subscribe(data => this.filters[0].options = data.results.map((film: any) => ({ label: film.title, selected: false })));
+    this.dataService.getSpecies().subscribe(data => this.filters[1].options = data.results.map((specie: any) => ({ label: specie.name, selected: false })));
+    this.dataService.getVehicles().subscribe(data => this.filters[2].options = data.results.map((vehicle: any) => ({ label: vehicle.name, selected: false })));
+    this.dataService.getStarships().subscribe(data => this.filters[3].options = data.results.map((starship: any) => ({ label: starship.name, selected: false })));
+    this.dataService.getPeople().subscribe(data => {
+      this.characters = data.results;
 
-  @Input() set filterValues(filters: any) {
-    this.filters = filters;
-    this.currentPage = 0;
-    // Apply filters to already fetched data and update table
-    this.dataSource.data = this.applyFilters(this.fetchedData);
-  }
+      // Extract the birth years from the list of characters
+      const birthYears = data.results.map((character: any) => character.birth_year);
 
-  onPageChange(event: any) {
-    this.currentPage = event.pageIndex;
-    // Update table with paginated data from already fetched data
-    this.dataSource.data = this.paginate(this.fetchedData, this.currentPage, this.pageSize);
-  }
+      // Create a Set to filter out unique birth years
+      const uniqueBirthYears = Array.from(new Set(birthYears));
 
-  loadCharacters() {
-    this.dataService.getPeople().subscribe((data) => {
-      this.fetchedData = data.results;  // Store fetched data locally
-      this.totalCharacters = this.fetchedData.length;
-      this.dataSource.data = this.paginate(this.fetchedData, this.currentPage, this.pageSize);
-      console.log(this.dataSource);
-      this.fetchedData.forEach((character, index) => {
-        if (character.species.length > 0) {
-          console.log(character.species);
-          this.dataService.getSpeciesData(character.species[0]).subscribe(speciesData => {
-            // Assuming speciesData contains the name of the species
-            this.fetchedData[index].species = speciesData.name;
-          });
-        } else {
-          // Handle case where species array is empty or species data is not available
-          this.fetchedData[index].species = '---';
-        }
-      });
+      // Map the unique birth years to the desired format
+      const birthYearOptions = uniqueBirthYears.map(year => ({ label: String(year), selected: false }));
+
+      // Assign the formatted birth years to the appropriate filter
+      this.filters[4].options = birthYearOptions;
+
+      this.paginate(this.characters);  // Initialize with all characters
     });
   }
 
-  applyFilters(data: any[]) {
-    let filteredData = data;
-    console.log("filteredData",data);
-    if (this.filters.movieName && !this.filters.movieName.all) {
-      filteredData = filteredData.filter((character) =>
-        this.filters.movieName[character.films]
-      );
-    }
+  toggleAll(filter: Filter) {
+    filter.options.forEach(option => option.selected = filter.all);
+  }
 
-    if (this.filters.species && !this.filters.species.all) {
-      filteredData = filteredData.filter((character) =>{
-        this.filters.species[character.species];
-        console.log(this.filters.species[character.species]);
+  applyFilters() {
+    let filteredCharacters = this.characters;
+  
+    this.filters.forEach(filter => {
+      if (!filter.all) {
+        const selectedOptions = filter.options.filter(option => option.selected).map(option => option.label);
+        if (selectedOptions.length) {
+          filteredCharacters = filteredCharacters.filter(character => {
+            if (filter.label === 'Movie Name') {
+              return character.films.some((film: any) => {
+                const filmTitle = this.filters[0].options.find(o => o.label === film)?.label;
+                return filmTitle ? selectedOptions.includes(filmTitle) : false;
+              });
+            }
+            if (filter.label === 'Species') {
+              return character.species.some((specie: any) => {
+                const specieName = this.filters[1].options.find(o => o.label === specie)?.label;
+                return specieName ? selectedOptions.includes(specieName) : false;
+              });
+            }
+            if (filter.label === 'Vehicles') {
+              return character.vehicles.some((vehicle: any) => {
+                const vehicleName = this.filters[2].options.find(o => o.label === vehicle)?.label;
+                return vehicleName ? selectedOptions.includes(vehicleName) : false;
+              });
+            }
+            if (filter.label === 'Star Ships') {
+              return character.starships.some((starship: any) => {
+                const starshipName = this.filters[3].options.find(o => o.label === starship)?.label;
+                return starshipName ? selectedOptions.includes(starshipName) : false;
+              });
+            }
+            if (filter.label === 'Birth Year') {
+              return selectedOptions.includes(character.birth_year);
+            }
+            return false;
+          });
+        }
       }
-      );
+    });
+  
+    this.paginate(filteredCharacters);
+  }
+  
+
+  paginate(characters: any[]) {
+    this.totalPages = Math.ceil(characters.length / this.pageSize);
+    this.currentPage = 0;  // Reset to the first page
+    this.paginatedCharacters = characters.slice(0, this.pageSize);
+  }
+
+  changePage(page: number) {
+    if (page >= 0 && page < this.totalPages) {
+      this.currentPage = page;
+      this.paginatedCharacters = this.characters.slice(page * this.pageSize, (page + 1) * this.pageSize);
     }
-   
-
-
-    // Similarly apply other filters
-
-    return filteredData;
   }
 
-  paginate(array: any[], page: number, pageSize: number): any[] {
-    const startIndex = page * pageSize;
-    return array.slice(startIndex, startIndex + pageSize);
-  }
-  getIdFromUrl(url: string): string {
-    const parts = url.split('/');
-    return parts[parts.length - 2];
-  }
-  goToDetails(id:any){
-    console.log("goToDetails "+id)
-    this.router.navigate(['character/'+id]);
-  }
-  search(){
-    alert("need to implement")
+  getPages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i);
   }
 }

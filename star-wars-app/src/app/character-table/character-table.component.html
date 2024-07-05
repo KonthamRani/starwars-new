@@ -1,105 +1,53 @@
-<div class="container" style="justify-content:flex-start">
-    <div class="filters-container">
-        <h1>Filters</h1>
-        <mat-accordion>
-            <mat-expansion-panel>
-              <mat-expansion-panel-header>
-                <mat-panel-title>Movie Name</mat-panel-title>
-              </mat-expansion-panel-header>
-              <mat-checkbox [(ngModel)]="filters.movieName['all']">All</mat-checkbox>
-             <br> <mat-checkbox *ngFor="let film of films" [(ngModel)]="filters.movieName[film.title]">
-                {{ film.title }}
-              </mat-checkbox>
-            </mat-expansion-panel>
-          
-            
-            <mat-expansion-panel>
-                <mat-expansion-panel-header>
-                  <mat-panel-title>Species</mat-panel-title>
-                </mat-expansion-panel-header>
-                <mat-checkbox [(ngModel)]="filters.species['all']">All</mat-checkbox>
-                <br><mat-checkbox *ngFor="let specie of species" [(ngModel)]="filters.species[specie.name]">
-                  {{ specie.name }}
-                </mat-checkbox>
-              </mat-expansion-panel>
+<!-- character-table.component.html -->
+<div class="container mt-4">
+  <mat-accordion>
+    <mat-expansion-panel *ngFor="let filter of filters">
+      <mat-expansion-panel-header>
+        <mat-panel-title>{{ filter.label }}</mat-panel-title>
+      </mat-expansion-panel-header>
+      <mat-checkbox [(ngModel)]="filter.all" (change)="toggleAll(filter)">All</mat-checkbox>
+      <br>
+      <mat-checkbox *ngFor="let option of filter.options" [(ngModel)]="option.selected" [disabled]="filter.all">
+        {{ option.label }}
+      </mat-checkbox>
+    </mat-expansion-panel>
+    <button mat-raised-button color="primary" (click)="applyFilters()">Search</button>
+  </mat-accordion>
 
-            <mat-expansion-panel>
-                <mat-expansion-panel-header>
-                  <mat-panel-title>Vehicles</mat-panel-title>
-                </mat-expansion-panel-header>
-                <mat-checkbox [(ngModel)]="filters.vehicles['all']">All</mat-checkbox>
-                <br><mat-checkbox *ngFor="let vehicle of vehicles" [(ngModel)]="filters.vehicles[vehicle.name]">
-                  {{ vehicle.name }}
-                </mat-checkbox>
-              </mat-expansion-panel>
+  <table class="table mt-4">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Species</th>
+        <th scope="col">Birth Year</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let character of paginatedCharacters; let i = index">
+        <th scope="row">{{ (currentPage * pageSize) + i + 1 }}</th>
+        <td>{{ character.name }}</td>
+        <td>{{ character.species }}</td>
+        <td>{{ character.birth_year }}</td>
+      </tr>
+    </tbody>
+  </table>
 
-            <mat-expansion-panel>
-                <mat-expansion-panel-header>
-                  <mat-panel-title>Star Ships</mat-panel-title>
-                </mat-expansion-panel-header>
-                <mat-checkbox [(ngModel)]="filters.starships['all']">All</mat-checkbox>
-                <br><mat-checkbox *ngFor="let starship of starships" [(ngModel)]="filters.starships[starship.name]">
-                  {{ starship.name }}
-                </mat-checkbox>
-              </mat-expansion-panel>
-
-            <mat-expansion-panel>
-                <mat-expansion-panel-header>
-                  <mat-panel-title>Birth Year</mat-panel-title>
-                </mat-expansion-panel-header>
-                <mat-checkbox [(ngModel)]="filters.birthYear['all']">All</mat-checkbox>
-                <br><mat-checkbox *ngFor="let year of birthYear" [(ngModel)]="filters.birthYear">
-                  {{ year }}
-                </mat-checkbox>
-              </mat-expansion-panel>
-              
-          
-            <!-- Repeat similar blocks for Vehicles, Star Ships, Birth Year -->
-          
-            <button mat-raised-button color="primary" (click)="search()">Search</button>
-          </mat-accordion>
-        </div>
-    <div class="table">
-        <mat-table [dataSource]="dataSource">
-            <ng-container matColumnDef="sNo">
-              <mat-header-cell *matHeaderCellDef> S.No </mat-header-cell>
-              <mat-cell *matCellDef="let element; let i = index"> 
-                {{ currentPage * pageSize + i + 1 }} 
-              </mat-cell>
-            </ng-container>
-          
-                <ng-container matColumnDef="name">
-                  <mat-header-cell *matHeaderCellDef> Character Name </mat-header-cell>
-                  <mat-cell *matCellDef="let element; let i=index;">
-                    <div (click)="goToDetails(i+1)" style="cursor:pointer"> 
-        
-                        {{element.name}}
-                    </div>
-                    <!-- <a routerLink="character/"{{element.index}} (click)="details(element)">{{ element.name }}</a> -->
-                  </mat-cell>
-                </ng-container>
-              
-          
-            <ng-container matColumnDef="species">
-              <mat-header-cell *matHeaderCellDef> Species </mat-header-cell>
-              <mat-cell *matCellDef="let element"> {{element.species}} </mat-cell>
-            </ng-container>
-          
-            <ng-container matColumnDef="birthYear">
-                <mat-header-cell *matHeaderCellDef> Birth Year </mat-header-cell>
-                <mat-cell *matCellDef="let element">
-                  {{ element.birth_year === 'unknown' ? '---' : element.birth_year }}
-                </mat-cell>
-              </ng-container>
-          
-            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-          </mat-table>
-          
-          <mat-paginator [length]="totalCharacters" [pageSize]="pageSize" (page)="onPageChange($event)">
-          </mat-paginator>
-    </div>
+  <nav aria-label="Page navigation example">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 0">
+        <a class="page-link" href="#" aria-label="Previous" (click)="changePage(currentPage - 1)">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item" *ngFor="let page of getPages()" [class.active]="currentPage === page">
+        <a class="page-link" href="#" (click)="changePage(page)">{{ page + 1 }}</a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage >= totalPages - 1">
+        <a class="page-link" href="#" aria-label="Next" (click)="changePage(currentPage + 1)">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
 </div>
-
-
-  
