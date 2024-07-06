@@ -10,7 +10,7 @@
   <mat-accordion>
     <mat-expansion-panel *ngFor="let filter of filters" >
       <mat-expansion-panel-header>
-        <mat-panel-title>{{ filter.label }}</mat-panel-title>
+        <mat-panel-title class="panel-title">{{ filter.label }}</mat-panel-title>
       </mat-expansion-panel-header>
       <mat-checkbox class="left-aligned-checkbox" [(ngModel)]="filter.all" [checked]="isAllSelected" (change)="toggleAll(filter)">All</mat-checkbox>
       <br>
@@ -24,8 +24,9 @@
   <div class="table-container">
     <h1 style="margin-bottom: 0px;">SEARCH RESULTS</h1>
     <span>(By default this table will have all the data)</span>
-    <div class="table-with-pagination">
-  <table>
+    <div *ngIf="!paginatedCharacters.length" class="no-records">NO RECORDS FOUND</div>
+    <div class="table-with-pagination" *ngIf="paginatedCharacters.length">
+  <table >
     <thead >
       <tr>
         <th scope="col">Sl. No</th>

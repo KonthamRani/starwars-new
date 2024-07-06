@@ -30,9 +30,6 @@ body{
     border-radius:12px !important;
     background-color: #8572722e!important
   }
-  mat-panel-title{
-   color: #459d84 !important;
-  }
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mat-mdc-checkbox .mdc-checkbox .mdc-checkbox__native-control:enabled:checked~.mdc-checkbox__background{
@@ -86,4 +83,13 @@ th{
 .spinner-border{
   height: 100px;
   width: 100px;
+}
+
+.mat-expansion-panel-header {
+  color: black !important; /* Default color */
+  transition: color 0.3s ease-in-out; /* Add transition for smooth color change */
+}
+
+.mat-expanded .mat-expansion-panel-header {
+  color: red !important; /* Color for open state */
 }

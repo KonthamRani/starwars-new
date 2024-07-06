@@ -26,10 +26,7 @@ div h1{
   mat-expansion-panel-header {
     background-color: #dee2e6 !important;
   }
-  
-  mat-panel-title {
-    font-size: 18px;
-  }
+ 
   
   mat-checkbox {
     margin: 4px 0;
@@ -81,4 +78,18 @@ th{
     color: #6b6161;
     padding: 14px;
     text-align: left;
+}
+.no-records{
+    text-align: center;
+    padding: 107px 27px;
+    font-size: 24px;
+    color: grey;
+}
+.panel-title {
+  color: #459d84 !important;
+  font-size: 18px;
+}
+
+.mat-expansion-panel-header.mat-expanded .panel-title {
+  color: white !important; /* Color when the panel is open */
 }

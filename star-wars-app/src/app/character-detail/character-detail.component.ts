@@ -16,7 +16,6 @@ export class CharacterDetailComponent implements OnInit, OnDestroy {
   vehicles: any = [];
   starships: any = [];
 selectedUserId:string=this._activatedRoute.snapshot.params['id'];
-  private routeSubscription: Subscription | null = null;
   isLoading: boolean=true;
 
   constructor(
