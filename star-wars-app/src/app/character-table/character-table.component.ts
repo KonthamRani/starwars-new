@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DataService } from '../data.service';
 import { Router } from '@angular/router';
+import { map, Observable } from 'rxjs';
 
 interface FilterOption {
   label: string;
@@ -107,17 +108,71 @@ getPeopleData(){
     this.characters = data.results;
     const birthYears = data.results.map((character: any) => character.birth_year);
     const uniqueBirthYears = Array.from(new Set(birthYears));
-    const birthYearOptions = uniqueBirthYears.map(year => ({ label: String(year), selected: false }));
+    const birthYearOptions = uniqueBirthYears.map(year => ({ label: String(year), selected: true }));
     this.filters[4].options = birthYearOptions;
+    //species data
+    this.characters.map(ch=>{
+      ch.species.map((s: string)=>{
+        this.dataService.getSpecie(s).subscribe(data=>{
+          ch.species=data.name;
+        })
+      })
+    })
+    //movies data
+    this.characters.map(ch=>{
+      ch.films.map((s: string)=>{
+        ch.films=[];
+        this.dataService.getFilm(s).subscribe(data=>{
+          ch.films.push(data.title);
+        })
+      })
+    })
+    //vehicles data
+    this.characters.map(ch=>{
+      ch.vehicles.map((s: string)=>{
+        ch.vehicles=[];
+        this.dataService.getVehicle(s).subscribe(data=>{
+          ch.vehicles.push(data.name);
+        })
+      })
+    })
+    //starship data
+    this.characters.map(ch=>{
+      ch.starships.map((s: string)=>{
+        ch.starships=[];
+        this.dataService.getStarship(s).subscribe(data=>{
+          ch.starships.push(data.name);
+        })
+      })
+    })
+    console.log(this.characters)
     this.paginate(this.characters);
   });
 }
-  toggleAll(filter: Filter) {
-    filter.options.forEach(option => option.selected = filter.all);
-  }
-  optionSelected(option:any){
-    
-    this.isAllSelected=option;
+optionSelected(filter: Filter) {
+  const allSelected = filter.options.every(option => option.selected);
+  filter.all = allSelected;
+  this.isAnyAllDeselected = !this.filters.every(f => f.all);
+}
+
+toggleAll(filter: Filter) {
+  filter.options.forEach(option => option.selected = filter.all);
+  this.isAnyAllDeselected = !this.filters.every(f => f.all);
+}
+isAnyAllDeselected = true; 
+toggleAll1(filter: Filter) {
+  filter.options.forEach(option => option.selected = filter.all);
+}
+
+  optionSelected1(filter:any){
+    console.log(filter);
+    this.isAllSelected=true;
+    filter.options.map((opt:any)=>{
+      if(opt.selected===false){
+        this.isAllSelected=false;
+      }
+    })
+    // this.isAllSelected=filter.selected;
   }
   applyFilters() {
     let filteredCharacters = this.characters;
@@ -128,8 +183,44 @@ getPeopleData(){
         if (selectedOptions.length) {
           filteredCharacters = filteredCharacters.filter(character => {
             if (filter.label === 'Movie Name') {
+              return character.films.some((film: any) => selectedOptions.includes(film));
+            }
+            if (filter.label === 'Species') {
+              return character.species.some((specie: any) => selectedOptions.includes(specie));
+            }
+            if (filter.label === 'Vehicles') {
+              return character.vehicles.some((vehicle: any) => selectedOptions.includes(vehicle));
+            }
+            if (filter.label === 'Star Ships') {
+              return character.starships.some((starship: any) => selectedOptions.includes(starship));
+            }
+            if (filter.label === 'Birth Year') {
+              return selectedOptions.includes(character.birth_year);
+            }
+            return false;
+          });
+        }
+      }
+    });
+  
+    this.paginate(filteredCharacters);
+  }
+  
+  applyFilters1() {
+    let filteredCharacters = this.characters;
+  
+    this.filters.forEach(filter => {
+      if (!filter.all) {
+        const selectedOptions = filter.options.filter(option => option.selected).map(option => option.label);
+        if (selectedOptions.length) {
+          filteredCharacters = filteredCharacters.filter(character => {
+            if (filter.label === 'Movie Name') {
+              // console.log("inside filter",this.filters[0].options);
               return character.films.some((film: any) => {
-                const filmTitle = this.filters[0].options.find(o => o.label === film)?.label;
+                // console.log("film",film)
+                const filmTitle = this.filters[0].options.find(o =>{
+                  console.log("iniside condition",film+"  "+o.label==film)
+                  o.label === film})?.label;
                 return filmTitle ? selectedOptions.includes(filmTitle) : false;
               });
             }
@@ -184,4 +275,10 @@ getPeopleData(){
     console.log("goToDetails "+id)
     this.router.navigate(['character/'+id]);
   }
+  getSpecieData(url: any): Observable<string> {
+    return this.dataService.getSpecie(url).pipe(
+      map(data => data.name)
+    );
+  }
+
 }

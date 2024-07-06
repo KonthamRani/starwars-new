@@ -8,13 +8,13 @@
   <div class="filters-container">
     <h1>FILTERS</h1>
   <mat-accordion>
-    <mat-expansion-panel *ngFor="let filter of filters" >
+    <mat-expansion-panel *ngFor="let filter of filters">
       <mat-expansion-panel-header>
         <mat-panel-title class="panel-title">{{ filter.label }}</mat-panel-title>
       </mat-expansion-panel-header>
-      <mat-checkbox class="left-aligned-checkbox" [(ngModel)]="filter.all" [checked]="isAllSelected" (change)="toggleAll(filter)">All</mat-checkbox>
+      <mat-checkbox class="left-aligned-checkbox" [checked]="isAllSelected" [(ngModel)]="filter.all" (change)="toggleAll(filter)">All</mat-checkbox>
       <br>
-      <mat-checkbox *ngFor="let option of filter.options" (change)="optionSelected(option.selected)" [(ngModel)]="option.selected" >
+      <mat-checkbox *ngFor="let option of filter.options" [(ngModel)]="option.selected" (change)="optionSelected(filter)">
         {{ option.label }}
       </mat-checkbox>
     </mat-expansion-panel>
@@ -39,7 +39,7 @@
       <tr *ngFor="let character of paginatedCharacters; let i = index">
         <td scope="row">{{ (currentPage * pageSize) + i + 1 }}</td>
         <td (click)="goToDetails(i+1)" style="cursor: pointer;">{{ character.name }}</td>
-        <td>{{ character.species }}</td>
+        <td>{{ character.species? character.species:'--'}} </td>
         <td>{{ character.birth_year }}</td>
       </tr>
     </tbody>
