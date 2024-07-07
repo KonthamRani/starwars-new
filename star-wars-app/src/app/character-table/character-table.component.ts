@@ -76,8 +76,8 @@ getVehiclesData(){
   this.dataService.getVehicles().subscribe(data =>
     {
       this.isLoading=false;
-
       this.filters[2].options = data.results.map((vehicle: any) => ({ label: vehicle.name, selected: true }))
+    console.log(this.filters[2].options);
     },
     error=>{
       this.isLoading=false;
@@ -91,8 +91,8 @@ getStarShipsData(){
   this.isLoading=true;
   this.dataService.getStarships().subscribe(data => 
     {
-
       this.filters[3].options = data.results.map((starship: any) => ({ label: starship.name, selected: true }))
+      this.isLoading=false;
     },
      error=>{
       this.isLoading=false;
@@ -112,42 +112,73 @@ getPeopleData(){
     this.filters[4].options = birthYearOptions;
     //species data
     this.characters.map(ch=>{
+      this.isLoading=true;
       ch.species.map((s: string)=>{
         this.dataService.getSpecie(s).subscribe(data=>{
           ch.species=data.name;
+          this.isLoading=false;
+        },
+        error=>{
+          this.isLoading=false;
+          console.log("getSpecie",error)
         })
       })
     })
     //movies data
     this.characters.map(ch=>{
+      this.isLoading=true;
       ch.films.map((s: string)=>{
         ch.films=[];
         this.dataService.getFilm(s).subscribe(data=>{
           ch.films.push(data.title);
+          this.isLoading=false;
+        },
+        error=>{
+          this.isLoading=false;
+          console.log("getFilm",error)
         })
       })
     })
     //vehicles data
     this.characters.map(ch=>{
+      this.isLoading=true;
       ch.vehicles.map((s: string)=>{
         ch.vehicles=[];
         this.dataService.getVehicle(s).subscribe(data=>{
           ch.vehicles.push(data.name);
-        })
+          this.isLoading=false;
+        },
+        error=>{
+          this.isLoading=false;
+          console.log("getVehicle",error)
+        }
+      )
       })
     })
     //starship data
     this.characters.map(ch=>{
+      this.isLoading=true;
       ch.starships.map((s: string)=>{
         ch.starships=[];
         this.dataService.getStarship(s).subscribe(data=>{
           ch.starships.push(data.name);
-        })
+          this.isLoading=false;
+        },
+       error=>{
+        this.isLoading=false;
+        console.log("getStarship",error)
+      })
       })
     })
     console.log(this.characters)
     this.paginate(this.characters);
-  });
+  },
+  error=>{
+    this.isLoading=false;
+    console.log("getPeople",error)
+  }
+)
+  
 }
 optionSelected(filter: Filter) {
   const allSelected = filter.options.every(option => option.selected);
@@ -160,113 +191,60 @@ toggleAll(filter: Filter) {
   this.isAnyAllDeselected = !this.filters.every(f => f.all);
 }
 isAnyAllDeselected = true; 
-toggleAll1(filter: Filter) {
-  filter.options.forEach(option => option.selected = filter.all);
+  applyFilters() {
+    console.log('applyFilters called');
+    let filteredCharacters = this.characters;
+  
+    this.filters.forEach(filter => {
+      if (!filter.all) {
+        const selectedOptions = filter.options.filter(option => option.selected).map(option => option.label);
+        if (selectedOptions.length) {
+          console.log(`selectedOptions for ${filter.label}:`, selectedOptions);
+          filteredCharacters = filteredCharacters.filter(character => {
+            if (filter.label === 'Movie Name') {
+              return character.films.some((film: string) => selectedOptions.includes(film));
+            }
+            if (filter.label === 'Species') {
+              return selectedOptions.includes(character.species);
+            }
+            if (filter.label === 'Vehicles') {
+              return character.vehicles.some((vehicle: string) => selectedOptions.includes(vehicle));
+            }
+            if (filter.label === 'Star Ships') {
+              return character.starships.some((starship: string) => selectedOptions.includes(starship));
+            }
+            if (filter.label === 'Birth Year') {
+              return selectedOptions.includes(character.birth_year);
+            }
+            return false;
+          });
+          console.log(`filteredCharacters after ${filter.label} filter:`, filteredCharacters);
+        }
+      }
+    });
+  
+    this.paginate(filteredCharacters);
+    console.log('paginate called with characters:', filteredCharacters);
+  }
+
+  
+
+filteredCharacters: any[] = []; 
+paginate(characters: any[]) {
+  this.filteredCharacters = characters;  
+  this.totalPages = Math.ceil(characters.length / this.pageSize);
+  this.currentPage = 0;  
+  this.paginatedCharacters = characters.slice(0, this.pageSize);
+  console.log("Filtered and paginated characters:", this.paginatedCharacters);
 }
 
-  optionSelected1(filter:any){
-    console.log(filter);
-    this.isAllSelected=true;
-    filter.options.map((opt:any)=>{
-      if(opt.selected===false){
-        this.isAllSelected=false;
-      }
-    })
-    // this.isAllSelected=filter.selected;
+changePage(page: number) {
+  if (page >= 0 && page < this.totalPages) {
+    this.currentPage = page;
+    this.paginatedCharacters = this.filteredCharacters.slice(page * this.pageSize, (page + 1) * this.pageSize);
+    console.log("Paginated characters for page:", this.currentPage, this.paginatedCharacters);
   }
-  applyFilters() {
-    let filteredCharacters = this.characters;
-  
-    this.filters.forEach(filter => {
-      if (!filter.all) {
-        const selectedOptions = filter.options.filter(option => option.selected).map(option => option.label);
-        if (selectedOptions.length) {
-          filteredCharacters = filteredCharacters.filter(character => {
-            if (filter.label === 'Movie Name') {
-              return character.films.some((film: any) => selectedOptions.includes(film));
-            }
-            if (filter.label === 'Species') {
-              return character.species.some((specie: any) => selectedOptions.includes(specie));
-            }
-            if (filter.label === 'Vehicles') {
-              return character.vehicles.some((vehicle: any) => selectedOptions.includes(vehicle));
-            }
-            if (filter.label === 'Star Ships') {
-              return character.starships.some((starship: any) => selectedOptions.includes(starship));
-            }
-            if (filter.label === 'Birth Year') {
-              return selectedOptions.includes(character.birth_year);
-            }
-            return false;
-          });
-        }
-      }
-    });
-  
-    this.paginate(filteredCharacters);
-  }
-  
-  applyFilters1() {
-    let filteredCharacters = this.characters;
-  
-    this.filters.forEach(filter => {
-      if (!filter.all) {
-        const selectedOptions = filter.options.filter(option => option.selected).map(option => option.label);
-        if (selectedOptions.length) {
-          filteredCharacters = filteredCharacters.filter(character => {
-            if (filter.label === 'Movie Name') {
-              // console.log("inside filter",this.filters[0].options);
-              return character.films.some((film: any) => {
-                // console.log("film",film)
-                const filmTitle = this.filters[0].options.find(o =>{
-                  console.log("iniside condition",film+"  "+o.label==film)
-                  o.label === film})?.label;
-                return filmTitle ? selectedOptions.includes(filmTitle) : false;
-              });
-            }
-            if (filter.label === 'Species') {
-              return character.species.some((specie: any) => {
-                const specieName = this.filters[1].options.find(o => o.label === specie)?.label;
-                return specieName ? selectedOptions.includes(specieName) : false;
-              });
-            }
-            if (filter.label === 'Vehicles') {
-              return character.vehicles.some((vehicle: any) => {
-                const vehicleName = this.filters[2].options.find(o => o.label === vehicle)?.label;
-                return vehicleName ? selectedOptions.includes(vehicleName) : false;
-              });
-            }
-            if (filter.label === 'Star Ships') {
-              return character.starships.some((starship: any) => {
-                const starshipName = this.filters[3].options.find(o => o.label === starship)?.label;
-                return starshipName ? selectedOptions.includes(starshipName) : false;
-              });
-            }
-            if (filter.label === 'Birth Year') {
-              return selectedOptions.includes(character.birth_year);
-            }
-            return false;
-          });
-        }
-      }
-    });
-  
-    this.paginate(filteredCharacters);
-  }
-  
-
-  paginate(characters: any[]) {
-    this.totalPages = Math.ceil(characters.length / this.pageSize);
-    this.currentPage = 0;  // Reset to the first page
-    this.paginatedCharacters = characters.slice(0, this.pageSize);
-  }
-
-  changePage(page: number) {
-    if (page >= 0 && page < this.totalPages) {
-      this.currentPage = page;
-      this.paginatedCharacters = this.characters.slice(page * this.pageSize, (page + 1) * this.pageSize);
-    }
-  }
+}
 
   getPages(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i);
