@@ -12,7 +12,7 @@
       <mat-expansion-panel-header>
         <mat-panel-title class="panel-title">{{ filter.label }}</mat-panel-title>
       </mat-expansion-panel-header>
-      <mat-checkbox class="left-aligned-checkbox" [checked]="isAllSelected" [(ngModel)]="filter.all" (change)="toggleAll(filter)">All</mat-checkbox>
+      <mat-checkbox class="left-aligned-checkbox"  [(ngModel)]="filter.all" (change)="toggleAll(filter)">All</mat-checkbox>
       <br>
       <mat-checkbox *ngFor="let option of filter.options" [(ngModel)]="option.selected" (change)="optionSelected(filter)">
         {{ option.label }}

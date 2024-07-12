@@ -23,6 +23,7 @@ selectedUserId:string=this._activatedRoute.snapshot.params['id'];
   ) {}
 
   ngOnInit(): void {
+    console.log(this._activatedRoute);
     console.log("inside character detail ",this.selectedUserId? this.selectedUserId:"---")
     this.loadCharacterDetails(this.selectedUserId);
   }

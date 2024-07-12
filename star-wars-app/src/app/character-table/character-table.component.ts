@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit , DoCheck} from '@angular/core';
 import { DataService } from '../data.service';
 import { Router } from '@angular/router';
 import { map, Observable } from 'rxjs';
@@ -19,14 +19,14 @@ interface Filter {
   templateUrl: './character-table.component.html',
   styleUrls: ['./character-table.component.css']
 })
-export class CharacterTableComponent implements OnInit {
+export class CharacterTableComponent implements OnInit,DoCheck {
   isLoading:boolean=true;
   characters: any[] = [];
   paginatedCharacters: any[] = [];
   currentPage = 0;
   pageSize = 5;
   totalPages = 0;
-  isAllSelected:boolean=true;
+  isAllSelected:boolean=true;//no need
   filters: Filter[] = [
     { label: 'Movie Name', options: [], all: true },
     { label: 'Species', options: [], all: true },
@@ -36,6 +36,9 @@ export class CharacterTableComponent implements OnInit {
   ];
 
   constructor(private dataService: DataService,private router:Router) {}
+  ngDoCheck(): void {
+      console.log("ngDoCheck is called");
+  }
 
   ngOnInit() {
     this.getFilmsData();
@@ -170,7 +173,6 @@ getPeopleData(){
       })
       })
     })
-    console.log(this.characters)
     this.paginate(this.characters);
   },
   error=>{
@@ -183,24 +185,25 @@ getPeopleData(){
 optionSelected(filter: Filter) {
   const allSelected = filter.options.every(option => option.selected);
   filter.all = allSelected;
-  this.isAnyAllDeselected = !this.filters.every(f => f.all);
 }
 
 toggleAll(filter: Filter) {
+  console.log(filter);
   filter.options.forEach(option => option.selected = filter.all);
-  this.isAnyAllDeselected = !this.filters.every(f => f.all);
 }
-isAnyAllDeselected = true; 
   applyFilters() {
     console.log('applyFilters called');
     let filteredCharacters = this.characters;
   
     this.filters.forEach(filter => {
+      console.log(filter)
       if (!filter.all) {
         const selectedOptions = filter.options.filter(option => option.selected).map(option => option.label);
+        console.log(selectedOptions)
         if (selectedOptions.length) {
           console.log(`selectedOptions for ${filter.label}:`, selectedOptions);
           filteredCharacters = filteredCharacters.filter(character => {
+            console.log(character)
             if (filter.label === 'Movie Name') {
               return character.films.some((film: string) => selectedOptions.includes(film));
             }
